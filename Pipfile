@@ -11,6 +11,7 @@ sqlmodel = "*"
 psycopg2-binary = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 asyncpg = "*"
+alembic = "*"
 
 [dev-packages]
 

@@ -10,9 +10,9 @@ app.include_router(user_router, prefix='/users')
 app.include_router(event_router, prefix='/events')
 
 
-@app.on_event('startup')
-async def on_startup():
-    await init_db()
+# @app.on_event('startup')
+# async def on_startup():
+#     await init_db()
 
 
 @app.get('/')
