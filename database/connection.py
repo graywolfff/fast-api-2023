@@ -1,18 +1,21 @@
-from sqlmodel import SQLModel, Session, create_engine
-from models.events import Event
+from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
-database_file = 'planner.db'
-database_connection_string = f'sqlite:///{database_file}'
-connect_args = {
-    "check_same_thread": False
-}
-engine_url = create_engine(database_connection_string, echo=True, connect_args=connect_args)
+from database.settings import setting
 
-
-def conn():
-    SQLModel.metadata.create_all(engine_url)
+DATABASE_URL = setting.DATABASE_URL
+engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 
 
-def get_session():
-    with Session(engine_url) as session:
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+
+async def get_session() -> AsyncSession:
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
         yield session

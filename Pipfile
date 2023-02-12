@@ -8,6 +8,9 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 pydantic = {extras = ["email"], version = "*"}
 sqlmodel = "*"
+psycopg2-binary = "*"
+sqlalchemy = {extras = ["asyncio"], version = "*"}
+asyncpg = "*"
 
 [dev-packages]
 

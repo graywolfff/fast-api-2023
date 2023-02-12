@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from database.connection import conn
+from database.connection import init_db
 from routers.users import user_router
 from routers.events import event_router
 import uvicorn
@@ -11,8 +11,8 @@ app.include_router(event_router, prefix='/events')
 
 
 @app.on_event('startup')
-def on_startup():
-    conn()
+async def on_startup():
+    await init_db()
 
 
 @app.get('/')
