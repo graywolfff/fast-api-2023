@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from models.events import Event, EventUpdate
 from typing import List
+from auth.authenticate import authenticate
 
 event_router = APIRouter(
     tags=['Event']
@@ -12,7 +13,8 @@ event_router = APIRouter(
 
 
 @event_router.get('/', response_model=List[Event])
-async def retrieve_all_events(session: AsyncSession = Depends(get_session)) -> List[Event]:
+async def retrieve_all_events(session: AsyncSession = Depends(get_session),
+                              user: str = Depends(authenticate)) -> List[Event]:
     statement = select(Event)
     result = await session.execute(statement)
     events = result.scalars().all()
@@ -20,7 +22,8 @@ async def retrieve_all_events(session: AsyncSession = Depends(get_session)) -> L
 
 
 @event_router.get('/{id}', response_model=Event)
-async def retrieve_event(id: int, session: AsyncSession = Depends(get_session)) -> Event:
+async def retrieve_event(id: int, session: AsyncSession = Depends(get_session),
+                         user: str = Depends(authenticate)) -> Event:
     event = await session.get(Event, id)
     if event:
         return event
@@ -31,7 +34,8 @@ async def retrieve_event(id: int, session: AsyncSession = Depends(get_session)) 
 
 
 @event_router.post('/new', status_code=status.HTTP_201_CREATED)
-async def create_event(new_event: Event, session: AsyncSession = Depends(get_session)) -> Event:
+async def create_event(new_event: Event, session: AsyncSession = Depends(get_session),
+                       user: str = Depends(authenticate)) -> Event:
     session.add(new_event)
     await session.commit()
     await session.refresh(new_event)
@@ -40,7 +44,8 @@ async def create_event(new_event: Event, session: AsyncSession = Depends(get_ses
 
 
 @event_router.put('/{id}')
-async def update_event(id: int, new_data: EventUpdate, session: AsyncSession = Depends(get_session)) -> Event:
+async def update_event(id: int, new_data: EventUpdate, session: AsyncSession = Depends(get_session),
+                       user: str = Depends(authenticate)) -> Event:
     event = await session.get(Event, id)
     if event:
         event_data = new_data.dict(exclude_unset=True)
@@ -57,7 +62,8 @@ async def update_event(id: int, new_data: EventUpdate, session: AsyncSession = D
 
 
 @event_router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_event(id: int, session: AsyncSession = Depends(get_session)):
+async def delete_event(id: int, session: AsyncSession = Depends(get_session),
+                       user: str = Depends(authenticate)):
     event = await session.get(Event, id)
     if event:
         await session.delete(event)
@@ -70,7 +76,8 @@ async def delete_event(id: int, session: AsyncSession = Depends(get_session)):
 
 
 @event_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_all_events(session: AsyncSession = Depends(get_session)):
+async def delete_all_events(session: AsyncSession = Depends(get_session),
+                            user: str = Depends(authenticate)):
     query = sqlalchemy.delete(Event)
     await session.execute(query)
     await session.commit()

@@ -12,6 +12,9 @@ psycopg2-binary = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 asyncpg = "*"
 alembic = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 
